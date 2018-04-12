@@ -1,0 +1,122 @@
+#include<iostream>
+#include<unistd.h>
+#include<stdio.h>
+using namespace std;
+//ARRIVAL TIME, BURST TIME, completion, time quantum, ready queue, count, state, flag, time,p,n, burst_time,wait_time, turnaround_time
+int a[100], b[50], com[50]={0}, q, ready[50]={0},c=0, state, flag=0, time=0,p=0,n=0, bm[50]={0},wait,turn;
+float avg_wait,avg_turn;
+void Search1(int p,int time)
+{
+	for(int x=p+1;x<4;x++)
+	{
+		if(a[x]<=time)
+		{
+		ready[n]=x+1;
+		n++;
+		}
+	}
+}
+void Search2(int p, int time)
+{
+	for(int x=p+1;x<6;x++)
+	{
+		int fl=0;
+		for(int y=0;y<n;y++)
+		{
+			if(ready[y]==x+1)
+			{
+			fl++;
+			}
+			
+		}
+		if(a[x]<=time&&fl==0&&b[x]!=0)
+		{
+			ready[n]=x+1;
+			n++;
+		}
+	}
+}
+void AddQue(int p)
+{
+	ready[n]=p+1;
+	n++;
+}
+main()
+{
+	cout<<"AT = Arrival Time \nBT = Burst Time\nCT = Completion Time\nTT = Turnaround Time\nWT = Waiting Time\n\n";
+	for(int x=0;x<6;x++){
+	cout<<"\nProcess "<<x+1;
+	cout<<"\nArrival Time=";
+	cin>>a[x];
+	cout<<"Burst Time=";
+	cin>>b[x];
+	bm[x]=b[x];}
+	cout<<"\nEnter time quantum:";
+	cin>>q;
+	system("CLS");
+	cout<<endl<<"GANTT CHART"<<endl<<a[0];
+	do{
+		if(flag==0)
+		{
+			state=a[0];
+			if(bm[0]<=q)
+			{
+				time=state+bm[0];
+				bm[0]=0;
+				Search1(p,time);
+			}
+			else
+			{
+				bm[0]=bm[0]-q;
+				time=state+q;
+				Search1(p,time);
+				AddQue(p);
+			}
+		}
+		else
+		{
+			p=ready[0]-1;
+			state=time;
+			for(int x=0;x<n && n!=1;x++)
+			{
+				ready[x]=ready[x+1];
+			}
+			n--;
+			if(bm[p]<=q)
+			{
+				time=state+bm[p];
+				bm[p]=0;
+				Search2(p, time);
+			}
+		else
+		{
+			bm[p]=bm[p]-q;
+			time=state+q;
+			Search2(p, time);
+			AddQue(p);
+		}
+		}
+		if(bm[p]==0)
+		{
+			com[p]=time;
+		}
+		flag++;
+		cout<<"]-P"<<p+1<<"-["<<time;
+		cout<<"]-P"<<p+2<<"-["<<time;
+		cout<<"]-P"<<p+3<<"-["<<time;
+		cout<<"]-P"<<p+4<<"-["<<time;
+		cout<<"]-P"<<p+5<<"-["<<time;
+		cout<<"]-P"<<p+6<<"-["<<time;
+	}
+	while(n!=0);
+	cout<<"\n\nPROCESS\t AT\t BT\t CT\t TT\t WT\n";
+	for(int x=0;x<6;x++)
+	{
+		turn=com[x]-a[x];
+		wait=turn-b[x];
+		cout<<"P"<<x+1<<" \t "<<a[x]<<" \t "<<b[x]<<" \t "<<com[x]<<" \t "<<turn<<" \t "<<wait<<"\n";
+		avg_wait=avg_wait+wait;
+		avg_turn=avg_turn+turn;
+	}
+	cout<<"\nAVERAGE Total Time: "<<avg_turn/6<<"\nAVERAGE Wait Time: "<<avg_wait/6;
+}
